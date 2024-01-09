@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { twitterConfig, oauth } from '../config/twitter';
+import { twitterConfig, oauth } from '../config';
 import OpenAI from 'openai';
 
 const twitterAxiosConfig = {

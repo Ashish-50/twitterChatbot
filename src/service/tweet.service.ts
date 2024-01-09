@@ -1,46 +1,50 @@
-import axios from "axios";
-import { twitterAxiosClient } from "../utils/client";
+import { ITweet, TweetModel } from '../models/tweet';
 
-class TweetService {
-
-async addTweets(text:string){
-    try{
-       const tweetData = {
-        text
-       }
-       const response = await twitterAxiosClient.post(`/2/tweets`,tweetData)
-       const responseBody = {
-        status: 200,
-        message:"Tweet posted successfully",
-        data: response.data
-     }
-     return responseBody
-    }catch(error){
-        if (axios.isAxiosError(error)) {
-            console.error(error.response?.data);
-            throw new Error(error.response?.data);
-          } else {
-            console.error(error);
-            throw new Error('An unexpected error occurred.');
+export class TweetCRUDService {
+    public async createTweet(text:string):Promise<ITweet>{
+        try {
+            const newTweet = await TweetModel.create({ text });
+            return newTweet
+        } catch (error) {
+            throw new Error("something went wrong");
+            
+        }
+    }
+    public async getTweets():Promise<ITweet[]>{
+        try {
+            const tweets = await TweetModel.find().exec();
+            return tweets;
+          } catch (error) {
+            throw new Error("something went wrong");
           }
-  }
+    }
+    public async updateTweet(id:string,newText:string){
+        try {
+        const updatedTweet = await TweetModel.findByIdAndUpdate(
+          id,
+          { text: newText },
+          { new: true }
+        ).exec();
+  
+        if (!updatedTweet) {
+            throw new Error("something went wrong");
+        }
+  
+        return updatedTweet;
+      } catch (error) {
+        return error;
+      }}
+    public async deleteTweet(id:string){
+        try {
+            const deletedTweet = await TweetModel.findByIdAndDelete(id).exec();
+      
+            if (!deletedTweet) {
+                throw new Error("something went wrong");
+            }
+      
+            return deletedTweet;
+          } catch (error) {
+            throw new Error("something went wrong");
+          }
+    }
 }
-
-async deleteTweets(id:string){
-    try{
-       const response = await twitterAxiosClient.delete(`/2/tweets/${id}`)
-       const responseBody = {
-        status: 200,
-        message:"Tweet deleted successfully",
-        data: response.data
-     }
-     return responseBody
-    }catch(error){
-        console.error(error)
-        throw new Error((error as Error).message);
-  }
-}
-
-}
-
-export const tweetService = new TweetService;

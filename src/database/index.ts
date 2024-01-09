@@ -1,12 +1,11 @@
 
-import { connect, ConnectOptions } from 'mongoose';
-import {dbConnection} from '../config/twitter'
+import { connect } from 'mongoose';
+import {dbConnection} from '../config'
 
-console.log(dbConnection,"--------------------")
 
 export async function connectToDatabase(){
     try {
-        await connect(dbConnection.DBURL,dbConnection.options as ConnectOptions)
+        await connect(dbConnection.DBURL)
         console.log("database connected")
     } catch (error) {
         console.log(error)
