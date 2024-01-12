@@ -10,6 +10,7 @@ import cron from 'node-cron';
 import {tweetCron} from './src/utils/tweetCron'
 import {TweetAppService} from './src/service/tweetAppService.service'
 import { ErrorMiddleware } from './src/middleware/error.middleware';
+import imageRouter from './src/routes/image.routes';
 
 export class App{
     public tweetAppService = new TweetAppService();
@@ -70,6 +71,7 @@ export class App{
         routes.forEach(route => {
           this.app.use('/', route.router);
         });
+        this.app.use('/images', imageRouter);
         this.app.use('/health', (req, res) => {
           res.send({
             state: 'ready',

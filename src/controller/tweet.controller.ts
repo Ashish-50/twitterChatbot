@@ -8,7 +8,8 @@ export class tweetController {
         try {
             const tweetData = req.body;
             if(req.file){
-              tweetData.tweetImage = req.file.path
+              console.log(req.file.filename)
+              tweetData.tweetImage = req.file.filename
             }
               const newTweet = await this.tweetService.createTweet(tweetData)
               res.status(201).json({
