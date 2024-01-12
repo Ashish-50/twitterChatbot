@@ -1,9 +1,11 @@
 import { ITweet, TweetModel } from '../models/tweet';
 
 export class TweetCRUDService {
-    public async createTweet(text:string):Promise<ITweet>{
+    public async createTweet(tweetData:ITweet):Promise<ITweet>{
         try {
-            const newTweet = await TweetModel.create({ text });
+          console.log(tweetData)
+            const newTweet = await TweetModel.create(tweetData);
+            console.log(newTweet)
             return newTweet
         } catch (error) {
             throw new Error("something went wrong");

@@ -6,23 +6,27 @@ import { NODE_ENV, PORT,dbConnection,ORIGIN, CREDENTIAL } from './src/config';
 import { connect } from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
+import cron from 'node-cron';
+import {tweetCron} from './src/utils/tweetCron'
+import {TweetAppService} from './src/service/tweetAppService.service'
 import { ErrorMiddleware } from './src/middleware/error.middleware';
 
 export class App{
+    public tweetAppService = new TweetAppService();
     public app:express.Express;
     public env: string;
     public port:string | number;
     private server: HttpServer | undefined;
-
+    
     constructor(routes: Routes[]) {
-        this.app = express()
-        this.env = NODE_ENV || 'development';
-        this.port = PORT || 3990;
-        this.connectToDatabase();
-        this.initializeMiddlewares();
-        this.initializeRoutes(routes);
-        
-    this.initializeErrorHandling();
+      this.app = express()
+      this.env = NODE_ENV || 'development';
+      this.port = PORT || 3990;
+      this.connectToDatabase();
+      this.initializeMiddlewares();
+      this.scheduleCronJob()
+      this.initializeRoutes(routes);
+      this.initializeErrorHandling();
     }
     public listen(){
         try {
@@ -32,11 +36,16 @@ export class App{
                 console.info(`🚀 App listening on the port ${this.port}`);
                 console.info(`=================================`);
               });
-              /* Socket will never close */
               this.server.timeout = 0;
         } catch (error) {
             console.log(error);
         }
+    }
+    private scheduleCronJob() {
+      cron.schedule('*/1 * * * *', () => {
+        console.log('job is executing in every 1 minute');
+        tweetCron()
+      });
     }
     public getServer() {
         return this.app;
@@ -53,8 +62,6 @@ export class App{
       private initializeMiddlewares() {
         this.app.use(morgan('dev'));
         this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIAL }));
-
-       
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
 

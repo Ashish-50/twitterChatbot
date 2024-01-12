@@ -6,9 +6,12 @@ export class tweetController {
 
     public createTweet = async (req:Request,res:Response,next:NextFunction)=>{
         try {
-            const { text } = req.body;
-              const newTweet = await this.tweetService.createTweet(text)
-            res.status(201).json({
+            const tweetData = req.body;
+            if(req.file){
+              tweetData.tweetImage = req.file.path
+            }
+              const newTweet = await this.tweetService.createTweet(tweetData)
+              res.status(201).json({
               status: 'success',
               message: 'Tweet added successfully',
               data: newTweet,
@@ -23,7 +26,7 @@ export class tweetController {
           const page: string | undefined = req.query.page as string | undefined;
           const limit: string | undefined = req.query.limit as string | undefined;
           const parsedPage: number = parseInt(page || '1', 10);
-    const parsedLimit: number = parseInt(limit || '10', 10);
+          const parsedLimit: number = parseInt(limit || '10', 10);
             const tweets = await this.tweetService.getTweets(parsedPage,parsedLimit);
             res.status(200).json({
               status: 'success',
