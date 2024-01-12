@@ -10,9 +10,9 @@ export class TweetRoute implements Routes {
         this.initializeRoutes()
     }
     private initializeRoutes(){
-        this.router.post('/',this.tweet.createTweet),
-        this.router.get('/',this.tweet.getTweets)
-        this.router.put('/:id',this.tweet.updateTweet)
-        this.router.delete('/:id',this.tweet.updateTweet)
+        this.router.post(`${this.path}/createtweet`,this.tweet.createTweet),
+        this.router.get(`${this.path}/gettweet`,this.tweet.getTweets)
+        this.router.put(`${this.path}/updateTweet/:id`,this.tweet.updateTweet)
+        this.router.delete(`${this.path}/deleteTweet/:id`,this.tweet.deleteTweet)
      }
 }

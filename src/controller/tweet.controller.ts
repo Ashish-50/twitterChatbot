@@ -20,7 +20,11 @@ export class tweetController {
 
     public getTweets = async (req:Request,res:Response,next:NextFunction)=>{
         try {
-            const tweets = await this.tweetService.getTweets();
+          const page: string | undefined = req.query.page as string | undefined;
+          const limit: string | undefined = req.query.limit as string | undefined;
+          const parsedPage: number = parseInt(page || '1', 10);
+    const parsedLimit: number = parseInt(limit || '10', 10);
+            const tweets = await this.tweetService.getTweets(parsedPage,parsedLimit);
             res.status(200).json({
               status: 'success',
               message: 'Tweets retrieved successfully',

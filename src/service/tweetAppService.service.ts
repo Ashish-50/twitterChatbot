@@ -1,19 +1,30 @@
 import axios from "axios";
 import { twitterAxiosClient } from "../utils/client";
+import { ITweet, TweetModel } from "../models/tweet";
 
 export class TweetAppService {
-    public async addTweet(text:string){
+    public async addTweet(){
         try{
+            const latestTweet = await this.fetchLatestTweetFromDB();
+            if (!latestTweet) {
+                throw new Error('No tweets available to post');
+            }
             const tweet = {
-              text
+              text:latestTweet.text
              }
-            const response = await twitterAxiosClient.post(`/2/tweets`,tweet);
-             const responseBody = {
-              status: 200,
-              message:"Tweet posted successfully",
-              data: response
-           }
-           return responseBody
+             const response = await twitterAxiosClient.post(`/2/tweets`, tweet);
+             if (response.status === 201) {
+                 await this.deleteTweetFromDB(latestTweet.id);
+     
+                 const responseBody = {
+                     status: 200,
+                     message: "Tweet posted successfully",
+                     data: response.data
+                 };
+                 return responseBody;
+             } else {
+                 throw new Error('Failed to post tweet to Twitter');
+             }
           }catch(error){
               if (axios.isAxiosError(error)) {
                   console.error(error.response?.data);
@@ -52,4 +63,22 @@ export class TweetAppService {
              throw new Error((error as Error).message);
        }
       }
+
+    public async fetchLatestTweetFromDB(): Promise<ITweet | null> {
+        try {
+            const latestTweet = await TweetModel.findOne().sort({ dateAndTime: -1 }).exec();
+            return latestTweet;
+        } catch (error) {
+            console.error('Error fetching the latest tweet from the database:', error);
+            throw error;
+        }
+    }
+    public async deleteTweetFromDB(tweetId: string): Promise<void> {
+        try {
+            await TweetModel.findByIdAndDelete(tweetId).exec();
+        } catch (error) {
+            console.error('Error deleting the tweet from the database:', error);
+            throw error;
+        }
+    }
     }

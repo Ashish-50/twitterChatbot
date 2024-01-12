@@ -10,10 +10,15 @@ export class TweetCRUDService {
             
         }
     }
-    public async getTweets():Promise<ITweet[]>{
+    public async getTweets(page:number,limit:number){
         try {
-            const tweets = await TweetModel.find().exec();
-            return tweets;
+          const skip = (page - 1) * limit;
+          const tweets = await TweetModel.find()
+          .sort({ dateAndTime: -1 }) 
+          .skip(skip) 
+          .limit(limit)
+          .exec();
+          return tweets;
           } catch (error) {
             throw new Error("something went wrong");
           }

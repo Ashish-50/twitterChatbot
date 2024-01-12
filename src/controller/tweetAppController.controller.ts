@@ -3,9 +3,8 @@ import {TweetAppService} from '../service/tweetAppService.service'
 export class TweetAppController {
     public tweetAppService = new TweetAppService();
     public addTweet = async (req: Request, res: Response, next: NextFunction) => {
-        const { text } =  req.body;
         try{
-         const response = await this.tweetAppService.addTweet(text);
+         const response = await this.tweetAppService.addTweet();
          return res.status(response.status).json({
              status: "success",
              message: response.message,
